@@ -1,33 +1,28 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center; /* Center text horizontally */
     margin: auto;
-    width: 800px; /* Set width to avoid horizontal scrolling */
-    background: #f2f2f2;
-    color: #333;
-    font-size: 1em;
-    line-height: 1.5em;
-    margin-top: 20px; /* Adjust the margin as needed to position the content */
-    margin-bottom: 20px; /* Adjust the margin as needed to position the content */
-    padding: 0 20px;
-    
+    width: 1200px; /* Set width to avoid horizontal scrolling */
+    background: #f2f2f2;    
 }
 
 .chart {
-    width: 800; /* Adjust the width as needed */
-    text-align: left; /* Reset text alignment for the chart */
+    width: 1000px; /* Adjust the width as needed */
     margin: auto;
-    margin-top: 20px; /* Adjust the margin as needed to position the chart */
-    margin-bottom: 20px; /* Adjust the margin as needed to position the chart */
-    font-size: 0.8em;
-    font-family: Arial, sans-serif;
+    font-family: sans-serif;
     border-collapse: collapse;
     border: 1px solid #ccc;
     background: #fff;
-    text-align: center;
-    width: 800px; /* Set width to avoid horizontal scrolling */
-
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    height: 100vh; /* Adjust the container height as needed */
+    overflow: visible; /* Allow content to overflow outside the container */
 }
+.y-axis-label {
+    fill: black; /* Adjust the color as needed */
+    z-index: 1; /* Ensure it's displayed on top of other elements */
+}
+
+
 
 h1 {
     margin-top: 20px; /* Adjust the margin as needed to position the title */
@@ -43,5 +38,8 @@ h1 {
     text-align: center;
     margin: auto;
     width: 800px; /* Set width to avoid horizontal scrolling */
+}
 
+svg text.y-axis-label {
+    fill: black; /* Adjust the color as needed */
 }
