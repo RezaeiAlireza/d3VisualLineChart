@@ -1,7 +1,13 @@
+d3.select(".chart").insert("h1").text("Burglary Rates in the United States (1975-2015)")
+    .style("text-align", "center")
+    .style("font-family", "sans-serif")
+    .style("margin", "auto")
+    .style("margin-top", "60px");
+
 // Define chart dimensions and margins
 const margin = { top: 20, right: 20, bottom: 70, left: 70 };
 const width = 950 - margin.left - margin.right;
-const height = 600 - margin.top - margin.bottom;
+const height = 700 - margin.top - margin.bottom;
 
 // Create an SVG container with proper dimensions and margins
 const svg = d3.select(".chart")
@@ -21,7 +27,7 @@ d3.csv("data.csv").then(function(data) {
     // Define scales for x and y axes
     const xScale = d3.scaleBand()
         .domain(years)
-        .range([0, 800])
+        .range([0, 850])
         .padding(0.1);
 
     // Determine the minimum and maximum values of the data for the y-axis domain
@@ -76,58 +82,113 @@ d3.csv("data.csv").then(function(data) {
         .attr("class", "line")
         .attr("fill", "none")
         .attr("stroke", "#868585")
-        .attr("stroke-width", 2.5)
-        .attr("d", d => line(years.map(year => ({ year, value: d[year] }))));
-
-    // Add mouseover and click events to lines
+        .attr("stroke-width", 1.5)
+        .attr("d", d => line(years.map(year => ({ year, value: d[year] }))))
+        .attr("data-state", (d, i) => data[i].State); // Add the state name as a data attribute
+        
     lines.on("mouseover", function(d) {
-            d3.select(this)
-                .attr("stroke", "red")
-                .attr("stroke-width", 4);
-            svg.append("text")
-                .attr("class", "#5E1A15")
-                .attr("x", 10)
-                .attr("y", yScale(+d3.max(years, year => +d[year])) - 10)
-                .text(d.State);
+            const stateName = d3.select(this).attr("data-state");
+            if (!d3.select(this).classed("highlighted")) {
+                // Remove state label of previously highlighted line if a different line is being highlighted
+                svg.selectAll(".state-label").remove();
+                d3.select(this)
+                    .attr("stroke", "orange") // Change the highlight color to orange
+                    .attr("stroke-width", 4);
+                svg.selectAll(".state-label").remove();
+                svg.append("text")
+                    .attr("class", "state-label")
+                    .attr("x", 10)
+                    .attr("y", yScale(+d3.max(years, year => +d[year])) - 10)
+                    .text(stateName);
+            }
         })
-        .on("mouseout", function() {
-            d3.select(this)
-                .attr("stroke", "#868585")
-                .attr("stroke-width", 2);
-            svg.select(".state-label").remove();
+        .on("mouseout", function(d) {
+            if (!d3.select(this).classed("highlighted")) {
+                d3.select(this)
+                    .attr("stroke", "#868585")
+                    .attr("stroke-width", 1.5);
+                    svg.selectAll(".state-label").remove();
+            }
         })
+        
         .on("click", function(d) {
-            d3.select(this)
-                .attr("stroke", "green")
-                .attr("stroke-width", 4);
-            svg.append("text")
-                .attr("class", "state-label-permanent")
-                .attr("x", 10)
-                .attr("y", yScale(+d3.max(years, year => +d[year])) - 10)
-                .text(d.State);
-        });
+            svg.selectAll(".state-label-1").remove();
 
-    // Create a brush for the context area
-    const brush = d3.brushX()
-        .extent([[0, 450], [800, 500]])
-        .on("end", brushed);
+            const stateName = d3.select(this).attr("data-state");
+            const highlighted = d3.select(this).classed("highlighted");
 
-    // Create and append the context area
-    const context = svg.append("g")
-        .attr("class", "context")
-        .attr("transform", "translate(0, 450)");
+            // Reset all lines and state labels to their default state
+            svg.selectAll(".line, .state-label").classed("highlighted", false);
+            svg.selectAll(".line")
+                .attr("stroke", "#868585")
+                .attr("stroke-width", 1.5);
 
-    context.append("g")
-        .attr("class", "brush")
-        .call(brush)
-        .call(brush.move, [xScale(years[0]), xScale(years[3])]);
+            if (!highlighted) {
+                d3.select(this)
+                    .classed("highlighted", true)
+                    .attr("stroke", "green") // Change the highlight color to green
+                    .attr("stroke-width", 4);
+                svg.append("text")
+                    .attr("class", "state-label-1")
+                    .attr("x", 610)
+                    .attr("y", 10)
+                    .attr("fill", "green")
+                    .attr("font-weight", "bold")
+                    .text("Selected State: " + stateName);
+            }
+    });
+        
+    // Timeline Brushing
+    
+    
 
-    // Function to handle brushing
-    function brushed() {
-        const selection = d3.event.selection;
-        const selectedYears = selection.map(xScale.invert);
-        xScale.domain(selectedYears);
-        svg.selectAll(".line").attr("d", d => line(years.map(year => ({ year, value: d[year] }))));
-        svg.select(".x-axis").call(d3.axisBottom(xScale));
-    }
+    // // Create a brush for selecting a range of years
+    // const brush = d3.brushX()
+    //     .extent([[margin.left, margin.top], [width - margin.right, height - margin.bottom]])
+    //     .on("brush end", brushed);
+
+    // // Append the brush to the chart
+    // const brushGroup = svg.append("g")
+    //     .attr("class", "brush")
+    //     .call(brush);
+
+    // // Set the default brush selection to the entire range of years
+    // brushGroup.call(brush.move, [xScale(1984), xScale(2014)]);
+
+    // // Define the brushed function
+    // function brushed() {
+    //     // Get the selected range of years from the brush
+    //     const selection = d3.event.selection || [xScale(1984), xScale(2014)];
+    //     const [x0, x1] = selection.map(xScale.invert);
+
+    //     // Filter the data to include only the selected range of years
+    //     const filteredData = data.map(d => {
+    //         const filteredValues = Object.entries(d)
+    //             .filter(([key, value]) => key >= x0 && key <= x1)
+    //             .reduce((obj, [key, value]) => {
+    //                 obj[key] = value;
+    //                 return obj;
+    //             }, {});
+    //         return { State: d.State, ...filteredValues };
+    //     });
+
+    //     // Update the y-axis domain based on the filtered data
+    //     yScale.domain([0, d3.max(filteredData, d => d3.max(years, year => +d[year]))]);
+
+    //     // Update the lines and y-axis based on the filtered data
+    //     lines.data(filteredData)
+    //         .attr("d", d => line(years.map(year => ({ year, value: d[year] }))))
+    //         .attr("stroke", "#868585")
+    //         .attr("stroke-width", 1.5)
+    //         .attr("data-state", (d, i) => data[i].State)
+    //         .classed("highlighted", false);
+
+    //     svg.select(".y-axis")
+    //         .transition()
+    //         .duration(1000)
+    //         .call(d3.axisLeft(yScale));
+
+    //     // Remove any existing state labels
+    //     svg.selectAll(".state-label, .state-label-1").remove();
+    // }
 });
