@@ -1,7 +1,3 @@
-# Visualization and Visualize Data Analysis (A2)
-## Alireza Rezaei
-## 12207501
-
 ### Overal
 - This project uses a dataset in csv which is loaded using d3 in vis.js and visualize the line chart using d3.js. Also there is a brushing part at the bottom of chart to be able to zoom to see lines more precisely since it gets too complicated and unreadable in some timelines.
 - When hovering on a line the line gets highlighted and the name of responding state gets written on top left of the chart.
